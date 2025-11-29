@@ -1,56 +1,94 @@
+// Package main is the entry point for the go-native-squid-proxy.
 package main
 
 import (
-    "log" // Standard library log package
-    "net/http"
-    "os"
-    "os/signal"
-    "syscall"
+	"context"
+	"flag"
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
-    "proxy-server/pkg/config"
-    logger "proxy-server/pkg/log" // Alias to avoid redeclaration with standard log package
-    "proxy-server/pkg/proxy"
+	"github.com/yigitkonur/go-native-squid-proxy/pkg/config"
+	"github.com/yigitkonur/go-native-squid-proxy/pkg/log"
+	"github.com/yigitkonur/go-native-squid-proxy/pkg/proxy"
+)
 
-    "github.com/prometheus/client_golang/prometheus/promhttp"
+var (
+	// Version information (set via ldflags)
+	version   = "dev"
+	commit    = "none"
+	buildDate = "unknown"
 )
 
 func main() {
-    // Load configuration
-    cfg, err := config.LoadConfig()
-    if err != nil {
-        log.Fatalf("Error loading config: %v", err)
-    }
+	// Parse command line flags
+	configPath := flag.String("config", "", "Path to configuration file")
+	showVersion := flag.Bool("version", false, "Show version information")
+	flag.Parse()
 
-    // Setup logging
-    loggerInstance, err := logger.NewLogger(cfg.LogLevel)
-    if err != nil {
-        log.Fatalf("Error setting up logger: %v", err)
-    }
-    defer loggerInstance.Sync()
-    sugar := loggerInstance.Sugar()
+	// Show version and exit
+	if *showVersion {
+		fmt.Printf("go-native-squid-proxy %s\n", version)
+		fmt.Printf("  commit:  %s\n", commit)
+		fmt.Printf("  built:   %s\n", buildDate)
+		os.Exit(0)
+	}
 
-    // Setup metrics
-    http.Handle("/metrics", promhttp.Handler())
+	// Load configuration
+	cfg, err := config.Load(*configPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to load configuration: %v\n", err)
+		os.Exit(1)
+	}
 
-    // Initialize and start the proxy server
-    proxyServer := proxy.NewProxyServer(cfg, sugar)
-    sugar.Infof("Starting proxy server on %s", cfg.ServerAddress)
+	// Initialize logger
+	logger, err := log.New(cfg.Logging)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to initialize logger: %v\n", err)
+		os.Exit(1)
+	}
+	defer logger.Sync()
 
-    // Channel to handle OS signals for graceful shutdown
-    quit := make(chan os.Signal, 1)
-    signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	sugar := logger.Sugar()
+	sugar.Infow("starting go-native-squid-proxy",
+		"version", version,
+		"commit", commit,
+		"build_date", buildDate,
+	)
 
-    go func() {
-        if err := proxyServer.Start(); err != nil {
-            sugar.Fatalf("Failed to start proxy server: %v", err)
-        }
-    }()
+	// Create and start the proxy server
+	server := proxy.New(cfg, sugar)
 
-    // Wait for interrupt signal to gracefully shut down the server
-    <-quit
-    sugar.Info("Shutting down proxy server...")
-    if err := proxyServer.Shutdown(); err != nil {
-        sugar.Fatalf("Failed to gracefully shut down proxy server: %v", err)
-    }
-    sugar.Info("Proxy server stopped")
+	// Handle graceful shutdown
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	// Start server in goroutine
+	errChan := make(chan error, 1)
+	go func() {
+		if err := server.Start(); err != nil {
+			errChan <- err
+		}
+	}()
+
+	// Wait for shutdown signal or error
+	select {
+	case sig := <-quit:
+		sugar.Infow("received shutdown signal", "signal", sig.String())
+	case err := <-errChan:
+		sugar.Errorw("server error", "error", err)
+	}
+
+	// Graceful shutdown with timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := server.ShutdownWithContext(ctx); err != nil {
+		sugar.Errorw("shutdown error", "error", err)
+		os.Exit(1)
+	}
+
+	sugar.Info("server stopped gracefully")
 }

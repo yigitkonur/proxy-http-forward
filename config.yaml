@@ -1,4 +1,26 @@
-ServerAddress: ":8080"
-MaxConnections: 10000
-LogLevel: "info"
+# Go Native Squid Proxy Configuration
+# All settings can be overridden via environment variables with PROXY_ prefix
+# Example: PROXY_SERVER_ADDRESS=":9090" overrides server.address
 
+server:
+  address: ":8080"           # Address to listen on
+  read_timeout: 30s          # Read timeout for connections
+  write_timeout: 30s         # Write timeout for connections
+  idle_timeout: 120s         # Idle timeout for keep-alive connections
+  max_conns_per_ip: 10000    # Maximum connections per IP address
+  max_requests_per_conn: 0   # Max requests per connection (0 = unlimited)
+
+proxy:
+  dial_timeout: 10s          # Timeout for dialing upstream
+  response_timeout: 60s      # Timeout waiting for upstream response
+  max_idle_conns: 1000       # Maximum idle connections to keep
+
+logging:
+  level: "info"              # Log level: debug, info, warn, error
+  format: "console"          # Log format: console, json
+  output: "stdout"           # Log output: stdout, stderr, or file path
+
+metrics:
+  enabled: true              # Enable Prometheus metrics
+  address: ":9090"           # Metrics server address
+  path: "/metrics"           # Metrics endpoint path
