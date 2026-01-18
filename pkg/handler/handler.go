@@ -130,7 +130,7 @@ func (h *Handler) handleConnect(ctx *fasthttp.RequestCtx, start time.Time) {
 	}
 
 	// Connect to the destination
-	destConn, err := net.DialTimeout("tcp", host, h.config.DialTimeout)
+	destConn, err := h.dialHost(ctx, start, host)
 	if err != nil {
 		h.handleError(ctx, start, "CONNECT", "tunnel", err, "dial_failed")
 		return
@@ -144,6 +144,26 @@ func (h *Handler) handleConnect(ctx *fasthttp.RequestCtx, start time.Time) {
 	ctx.Hijack(func(clientConn net.Conn) {
 		h.tunnel(clientConn, destConn, host, start)
 	})
+}
+
+// dialHost connects to destination host.
+func (h *Handler) dialHost(ctx *fasthttp.RequestCtx, start time.Time, host string) (destConn net.Conn, err error) {
+	maxDials := h.config.MaxDialRetries + 1
+	
+	for i := 1; i <= maxDials; i++ {
+		destConn, err = net.DialTimeout("tcp", host, h.config.DialTimeout)
+		if err == nil {
+			break
+		}
+
+		if i < maxDials {
+			h.handleError(ctx, start, "CONNECT", "retry", err, fmt.Sprintf("#%d", i))
+
+			time.Sleep(h.config.DialRetryDelay)
+		}
+	}
+
+	return
 }
 
 // tunnel creates a bidirectional tunnel between client and destination.

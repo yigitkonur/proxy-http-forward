@@ -240,8 +240,10 @@ server:
 # Proxy behavior
 proxy:
   dial_timeout: 10s          # Upstream connect timeout
+  dial_retry_delay: 500ms    # Upstream connect retry delay
   response_timeout: 60s      # Upstream response timeout
   max_idle_conns: 1000       # Pooled connections
+  max_dial_retries: 3        # Upstream connect retries
 
 # Logging
 logging:

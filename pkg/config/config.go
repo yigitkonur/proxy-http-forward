@@ -31,8 +31,10 @@ type ServerConfig struct {
 // ProxyConfig holds proxy-specific configuration.
 type ProxyConfig struct {
 	DialTimeout     time.Duration `mapstructure:"dial_timeout"`
+	DialRetryDelay  time.Duration `mapstructure:"dial_retry_delay"`
 	ResponseTimeout time.Duration `mapstructure:"response_timeout"`
 	MaxIdleConns    int           `mapstructure:"max_idle_conns"`
+	MaxDialRetries  int           `mapstructure:"max_dial_retries"`
 }
 
 // LoggingConfig holds logging configuration.
@@ -107,8 +109,10 @@ func setDefaults(v *viper.Viper) {
 
 	// Proxy defaults
 	v.SetDefault("proxy.dial_timeout", "10s")
+	v.SetDefault("proxy.dial_retry_delay", "500ms")
 	v.SetDefault("proxy.response_timeout", "60s")
 	v.SetDefault("proxy.max_idle_conns", 1000)
+	v.SetDefault("proxy.max_dial_retries", 3)
 
 	// Logging defaults
 	v.SetDefault("logging.level", "info")
@@ -137,6 +141,9 @@ func (c *Config) Validate() error {
 	}
 	if c.Proxy.DialTimeout <= 0 {
 		return fmt.Errorf("proxy.dial_timeout must be > 0")
+	}
+	if c.Proxy.MaxDialRetries < 0 {
+		return fmt.Errorf("proxy.max_dial_retries must be >= 0")
 	}
 	if c.Metrics.Enabled && c.Metrics.Address == "" {
 		return fmt.Errorf("metrics.address cannot be empty when metrics are enabled")
