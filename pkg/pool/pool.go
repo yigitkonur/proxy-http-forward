@@ -7,7 +7,7 @@ import (
 
 	"github.com/valyala/fasthttp"
 
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/config"
+	"github.com/yigitkonur/proxy-http-forward/pkg/config"
 )
 
 // Pool manages a pool of fasthttp clients for making upstream requests.

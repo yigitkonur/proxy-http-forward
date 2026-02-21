@@ -1,4 +1,4 @@
-# Go Native Squid Proxy - Makefile
+# proxy-http-forward - Makefile
 # High-performance HTTP/HTTPS proxy server in pure Go
 
 BINARY_NAME := proxy
@@ -103,16 +103,16 @@ deps-verify: ## Verify dependencies
 ## Docker targets
 docker-build: ## Build Docker image
 	@echo "Building Docker image..."
-	docker build -t go-native-squid-proxy:$(VERSION) .
-	docker tag go-native-squid-proxy:$(VERSION) go-native-squid-proxy:latest
+	docker build -t proxy-http-forward:$(VERSION) .
+	docker tag proxy-http-forward:$(VERSION) proxy-http-forward:latest
 
 docker-run: ## Run Docker container
-	docker run -p 8080:8080 -p 9090:9090 go-native-squid-proxy:latest
+	docker run -p 8080:8080 -p 9090:9090 proxy-http-forward:latest
 
 docker-push: ## Push Docker image (requires DOCKER_REGISTRY env var)
 	@if [ -z "$(DOCKER_REGISTRY)" ]; then echo "DOCKER_REGISTRY not set"; exit 1; fi
-	docker tag go-native-squid-proxy:$(VERSION) $(DOCKER_REGISTRY)/go-native-squid-proxy:$(VERSION)
-	docker push $(DOCKER_REGISTRY)/go-native-squid-proxy:$(VERSION)
+	docker tag proxy-http-forward:$(VERSION) $(DOCKER_REGISTRY)/proxy-http-forward:$(VERSION)
+	docker push $(DOCKER_REGISTRY)/proxy-http-forward:$(VERSION)
 
 ## Utility targets
 clean: ## Clean build artifacts
@@ -127,7 +127,7 @@ version: ## Show version
 
 ## Help target
 help: ## Show this help
-	@echo "Go Native Squid Proxy - Available targets:"
+	@echo "proxy-http-forward - Available targets:"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 	@echo ""

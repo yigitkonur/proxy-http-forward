@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/config"
+	"github.com/yigitkonur/proxy-http-forward/pkg/config"
 )
 
 // Metrics holds all Prometheus metrics for the proxy.

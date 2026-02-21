@@ -12,9 +12,9 @@ import (
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
 
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/config"
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/metrics"
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/pool"
+	"github.com/yigitkonur/proxy-http-forward/pkg/config"
+	"github.com/yigitkonur/proxy-http-forward/pkg/metrics"
+	"github.com/yigitkonur/proxy-http-forward/pkg/pool"
 )
 
 // hopByHopHeaders lists headers that should not be forwarded.

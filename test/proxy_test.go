@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/config"
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/handler"
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/metrics"
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/pool"
+	"github.com/yigitkonur/proxy-http-forward/pkg/config"
+	"github.com/yigitkonur/proxy-http-forward/pkg/handler"
+	"github.com/yigitkonur/proxy-http-forward/pkg/metrics"
+	"github.com/yigitkonur/proxy-http-forward/pkg/pool"
 )
 
 // Shared metrics instance to avoid duplicate registration

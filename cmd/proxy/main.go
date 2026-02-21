@@ -1,4 +1,4 @@
-// Package main is the entry point for the go-native-squid-proxy.
+// Package main is the entry point for proxy-http-forward.
 package main
 
 import (
@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/config"
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/log"
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/proxy"
+	"github.com/yigitkonur/proxy-http-forward/pkg/config"
+	"github.com/yigitkonur/proxy-http-forward/pkg/log"
+	"github.com/yigitkonur/proxy-http-forward/pkg/proxy"
 )
 
 var (
@@ -30,7 +30,7 @@ func main() {
 
 	// Show version and exit
 	if *showVersion {
-		fmt.Printf("go-native-squid-proxy %s\n", version)
+		fmt.Printf("proxy-http-forward %s\n", version)
 		fmt.Printf("  commit:  %s\n", commit)
 		fmt.Printf("  built:   %s\n", buildDate)
 		os.Exit(0)
@@ -52,7 +52,7 @@ func main() {
 	defer logger.Sync()
 
 	sugar := logger.Sugar()
-	sugar.Infow("starting go-native-squid-proxy",
+	sugar.Infow("starting proxy-http-forward",
 		"version", version,
 		"commit", commit,
 		"build_date", buildDate,

@@ -1,4 +1,4 @@
-# Go Native Squid Proxy - Dockerfile
+# proxy-http-forward - Dockerfile
 # Multi-stage build for minimal image size
 
 # ============================================

@@ -1,4 +1,4 @@
-module github.com/yigitkonur/go-native-squid-proxy
+module github.com/yigitkonur/proxy-http-forward
 
 go 1.21
 

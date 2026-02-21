@@ -8,10 +8,10 @@ import (
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
 
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/config"
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/handler"
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/metrics"
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/pool"
+	"github.com/yigitkonur/proxy-http-forward/pkg/config"
+	"github.com/yigitkonur/proxy-http-forward/pkg/handler"
+	"github.com/yigitkonur/proxy-http-forward/pkg/metrics"
+	"github.com/yigitkonur/proxy-http-forward/pkg/pool"
 )
 
 // Server represents the proxy server.
@@ -39,7 +39,7 @@ func New(cfg *config.Config, logger *zap.SugaredLogger) *Server {
 	// Create fasthttp server
 	server := &fasthttp.Server{
 		Handler:               h.HandleRequest,
-		Name:                  "go-native-squid-proxy",
+		Name:                  "proxy-http-forward",
 		ReadTimeout:          cfg.Server.ReadTimeout,
 		WriteTimeout:         cfg.Server.WriteTimeout,
 		IdleTimeout:          cfg.Server.IdleTimeout,

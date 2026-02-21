@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/yigitkonur/go-native-squid-proxy/pkg/config"
+	"github.com/yigitkonur/proxy-http-forward/pkg/config"
 )
 
 // Logger wraps zap.Logger with convenience methods.
