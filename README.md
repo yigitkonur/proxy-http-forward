@@ -26,8 +26,8 @@ point your browser or `HTTP_PROXY` at `:8080` and you're done.
 ## install
 
 ```bash
-git clone https://github.com/yigitkonur/go-http-proxy-server.git
-cd go-http-proxy-server
+git clone https://github.com/yigitkonur/proxy-http-forward.git
+cd proxy-http-forward
 make build
 ```
 
